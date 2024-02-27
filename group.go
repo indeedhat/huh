@@ -36,11 +36,12 @@ type Group struct {
 	showErrors bool
 
 	// group options
-	width  int
-	height int
-	theme  *Theme
-	keymap *KeyMap
-	hide   func() bool
+	width     int
+	height    int
+	maxHeight int
+	theme     *Theme
+	keymap    *KeyMap
+	hide      func() bool
 }
 
 // NewGroup returns a new group with the given fields.
@@ -242,13 +243,14 @@ func (g *Group) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		g.WithHeight(min(g.fullHeight(), msg.Height-1))
+		g.maxHeight = msg.Height
 	case nextFieldMsg:
 		cmds = append(cmds, g.nextField()...)
 	case prevFieldMsg:
 		cmds = append(cmds, g.prevField()...)
 	}
 
+	g.WithHeight(min(g.fullHeight(), g.maxHeight))
 	g.buildView()
 
 	return g, tea.Batch(cmds...)

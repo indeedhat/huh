@@ -241,7 +241,7 @@ func (a *ArrayList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if a.textinputs[a.focused].Value() == "" {
 					cmds = append(cmds, nextField)
 				} else {
-					a.extendArrayList()
+					cmds = append(cmds, a.extendArrayList())
 				}
 			} else {
 				if a.err != nil {
@@ -262,7 +262,7 @@ func (a *ArrayList) View() string {
 	for i := range a.textinputs {
 		var ib strings.Builder
 		styles := a.theme.Blurred
-		if a.focused >= 0 {
+		if a.focused == i {
 			styles = a.theme.Focused
 		}
 
@@ -273,6 +273,10 @@ func (a *ArrayList) View() string {
 		a.textinputs[i].PromptStyle = styles.TextInput.Prompt
 		a.textinputs[i].Cursor.Style = styles.TextInput.Cursor
 		a.textinputs[i].TextStyle = styles.TextInput.Text
+
+		if i > 0 {
+			ib.WriteString("\n")
+		}
 
 		if i == 0 {
 			if a.title != "" {
@@ -295,10 +299,8 @@ func (a *ArrayList) View() string {
 				ib.WriteString(styles.Title.Render(strings.Repeat(" ", len(a.description))))
 			}
 		}
+
 		ib.WriteString(a.textinputs[i].View())
-		if i > 0 {
-			ib.WriteString("\n")
-		}
 		sb.WriteString(styles.Base.Render(ib.String()))
 	}
 
@@ -391,7 +393,8 @@ func (a *ArrayList) GetValue() any {
 	return *a.value
 }
 
-func (a *ArrayList) extendArrayList() {
+func (a *ArrayList) extendArrayList() tea.Cmd {
+	a.textinputs[a.focused].Blur()
 	input := textinput.New()
 
 	input.SetValue("")
@@ -409,5 +412,5 @@ func (a *ArrayList) extendArrayList() {
 
 	a.height++
 	a.focused++
-	a.Focus()
+	return a.Focus()
 }

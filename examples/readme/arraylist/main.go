@@ -1,6 +1,10 @@
 package main
 
-import "github.com/charmbracelet/huh"
+import (
+	"fmt"
+
+	"github.com/charmbracelet/huh"
+)
 
 // TODO: ensure input is a valid fruit
 func checkFruitName(s string) error { return nil }
@@ -11,7 +15,7 @@ func main() {
 	text := huh.NewArrayList().
 		Title("Name some fruits").
 		Validate(checkFruitName).
-		Placeholder("What's on your mind?").
+		Placeholder("Fruit...").
 		Value(&fruits)
 
 	text.Focus()
@@ -19,4 +23,6 @@ func main() {
 	// Create a form to show help.
 	form := huh.NewForm(huh.NewGroup(text))
 	form.Run()
+
+	fmt.Print(fruits)
 }
